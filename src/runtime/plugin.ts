@@ -71,168 +71,171 @@ function omit(object: Record<string, unknown>, keys: string[]): Record<string, u
   }, {} as Record<string, unknown>)
 }
 
-export default defineNuxtPlugin((nuxt) => {
-  const quasarAppConfig = useAppConfig()[appConfigKey] as QuasarUIConfiguration & { addressbarColor?: string }
-  const { lang, iconSet, plugins, components } = quasarNuxtConfig
-  let ssrContext: { req: IncomingMessage, res: ServerResponse } | undefined
-  let quasarProxy: QuasarServerPlugin | QuasarClientPlugin
-  // Since brand used in `nuxt.config` is pushed to `nuxt.options.css`, we exclude it here
-  let config = defuFn(quasarAppConfig, omit(quasarNuxtConfig.config || {}, ['brand']))
+export default defineNuxtPlugin({
+  name: 'quasar',
+  setup(nuxt) {
+    const quasarAppConfig = useAppConfig()[appConfigKey] as QuasarUIConfiguration & { addressbarColor?: string }
+    const { lang, iconSet, plugins, components } = quasarNuxtConfig
+    let ssrContext: { req: IncomingMessage, res: ServerResponse } | undefined
+    let quasarProxy: QuasarServerPlugin | QuasarClientPlugin
+    // Since brand used in `nuxt.config` is pushed to `nuxt.options.css`, we exclude it here
+    let config = defuFn(quasarAppConfig, omit(quasarNuxtConfig.config || {}, ['brand']))
 
-  if (import.meta.server) {
-    const BRAND_RE = /--q-[\w-]+:.+?;/g
-    const meta = reactive({
-      bodyClasses: '',
-      htmlAttrs: '',
-      endingHeadTags: '',
-    })
-    type MetaKey = keyof typeof meta
-    const htmlAttrsRecord = computed(() =>
-      Object.fromEntries(
-        meta.htmlAttrs
-          .split(' ')
-          .map(attr => attr.split('=')),
-      ),
-    )
-    // NOTE: Quasar currently only appends `endingHeadTags` with brand variables, this may break in future
-    const bodyStyles = computed(() => {
-      return [...meta.endingHeadTags.matchAll(BRAND_RE)]
-        .map(match => match[0])
-        .join('')
-    })
+    if (import.meta.server) {
+      const BRAND_RE = /--q-[\w-]+:.+?;/g
+      const meta = reactive({
+        bodyClasses: '',
+        htmlAttrs: '',
+        endingHeadTags: '',
+      })
+      type MetaKey = keyof typeof meta
+      const htmlAttrsRecord = computed(() =>
+        Object.fromEntries(
+          meta.htmlAttrs
+            .split(' ')
+            .map(attr => attr.split('=')),
+        ),
+      )
+      // NOTE: Quasar currently only appends `endingHeadTags` with brand variables, this may break in future
+      const bodyStyles = computed(() => {
+        return [...meta.endingHeadTags.matchAll(BRAND_RE)]
+          .map(match => match[0])
+          .join('')
+      })
 
-    useHead(
-      computed(() => ({
-        bodyAttrs: {
-          class: meta.bodyClasses,
-          style: bodyStyles.value,
-        },
-        htmlAttrs: htmlAttrsRecord.value,
-      } as ReactiveHead)),
-    )
-    ssrContext = {
-      req: nuxt.ssrContext!.event.node.req,
-      res: nuxt.ssrContext!.event.node.res,
-    }
-    quasarProxy = {
-      install({ ssrContext }) {
-        meta.bodyClasses = ssrContext._meta.bodyClasses
-        meta.htmlAttrs = ssrContext._meta.htmlAttrs
-        meta.endingHeadTags = ssrContext._meta.endingHeadTags
-        ssrContext._meta = new Proxy({} as Record<string | symbol, unknown>, {
-          get(target, key) {
-            return meta[key as MetaKey] ?? target[key]
+      useHead(
+        computed(() => ({
+          bodyAttrs: {
+            class: meta.bodyClasses,
+            style: bodyStyles.value,
           },
-          set(target, key, value) {
-            if (typeof meta[key as MetaKey] === 'string') {
-              meta[key as MetaKey] = value
-            }
-            else {
-              target[key] = value
-            }
-            return true
-          },
-        }) as QuasarSSRContext['_meta']
-      },
-    } as QuasarServerPlugin
-  }
-  else {
-    quasarProxy = {
-      install({ onSSRHydrated }) {
-        nuxt.hook('app:suspense:resolve', () => {
-          onSSRHydrated.forEach(fn => fn())
-        })
-      },
-    } as QuasarClientPlugin
-  }
-
-  // @ts-expect-error Private 2nd argument and custom plugin not defined in QuasarPlugins interface
-  nuxt.vueApp.use(Quasar, {
-    lang,
-    iconSet,
-    plugins: {
-      quasarProxy,
-      ...plugins,
-    },
-    config,
-  }, ssrContext)
-
-  const quasar = useQuasar()
-
-  const asDefault = (value: unknown) => (value && typeof value === 'object') ? () => value : value
-
-  for (const [name, propDefaults] of Object.entries(components.defaults || {})) {
-    const component = componentsWithDefaults[name]
-    if (!component) {
-      continue
-    }
-    for (const [propName, defaultValue] of Object.entries(propDefaults)) {
-      const propConfig = component.props[propName]
-      // Constructor or Array of Constructors
-      if (Array.isArray(propConfig) || typeof propConfig === 'function') {
-        component.props[propName] = {
-          type: propConfig,
-          default: asDefault(defaultValue),
-        }
+          htmlAttrs: htmlAttrsRecord.value,
+        } as ReactiveHead)),
+      )
+      ssrContext = {
+        req: nuxt.ssrContext!.event.node.req,
+        res: nuxt.ssrContext!.event.node.res,
       }
-      else if (typeof propConfig === 'object') {
-        if (propConfig) {
-          propConfig.default = asDefault(defaultValue)
-        }
-        else {
+      quasarProxy = {
+        install({ ssrContext }) {
+          meta.bodyClasses = ssrContext._meta.bodyClasses
+          meta.htmlAttrs = ssrContext._meta.htmlAttrs
+          meta.endingHeadTags = ssrContext._meta.endingHeadTags
+          ssrContext._meta = new Proxy({} as Record<string | symbol, unknown>, {
+            get(target, key) {
+              return meta[key as MetaKey] ?? target[key]
+            },
+            set(target, key, value) {
+              if (typeof meta[key as MetaKey] === 'string') {
+                meta[key as MetaKey] = value
+              }
+              else {
+                target[key] = value
+              }
+              return true
+            },
+          }) as QuasarSSRContext['_meta']
+        },
+      } as QuasarServerPlugin
+    }
+    else {
+      quasarProxy = {
+        install({ onSSRHydrated }) {
+          nuxt.hook('app:suspense:resolve', () => {
+            onSSRHydrated.forEach(fn => fn())
+          })
+        },
+      } as QuasarClientPlugin
+    }
+
+    // @ts-expect-error Private 2nd argument and custom plugin not defined in QuasarPlugins interface
+    nuxt.vueApp.use(Quasar, {
+      lang,
+      iconSet,
+      plugins: {
+        quasarProxy,
+        ...plugins,
+      },
+      config,
+    }, ssrContext)
+
+    const quasar = useQuasar()
+
+    const asDefault = (value: unknown) => (value && typeof value === 'object') ? () => value : value
+
+    for (const [name, propDefaults] of Object.entries(components.defaults || {})) {
+      const component = componentsWithDefaults[name]
+      if (!component) {
+        continue
+      }
+      for (const [propName, defaultValue] of Object.entries(propDefaults)) {
+        const propConfig = component.props[propName]
+        // Constructor or Array of Constructors
+        if (Array.isArray(propConfig) || typeof propConfig === 'function') {
           component.props[propName] = {
+            type: propConfig,
             default: asDefault(defaultValue),
           }
         }
-      }
-      else {
-        throw new TypeError(`Unexpected prop definition type used at ${name}.props.${propName}, please open an issue.`)
-      }
-    }
-  }
-
-  if (import.meta.dev && import.meta.client) {
-    watch(
-      () => quasarAppConfig,
-      (newAppConfig) => {
-        const prevConfig = config
-        config = defuFn(newAppConfig, quasarNuxtConfig.config)
-        quasar.addressbarColor?.set(config.addressbarColor || getPrimaryColor())
-        const modifiedBrand = getUpdatedDefaults(
-          config.brand || {},
-          prevConfig.brand || {},
-        )
-        for (const [name, color] of Object.entries(modifiedBrand)) {
-          if (!color) {
-            document.body.style.removeProperty(`--q-${name}`)
+        else if (typeof propConfig === 'object') {
+          if (propConfig) {
+            propConfig.default = asDefault(defaultValue)
           }
           else {
-            document.body.style.setProperty(`--q-${name}`, color)
+            component.props[propName] = {
+              default: asDefault(defaultValue),
+            }
           }
         }
-        if (prevConfig.dark !== config.dark) {
-          quasar.dark.set(config.dark || false)
+        else {
+          throw new TypeError(`Unexpected prop definition type used at ${name}.props.${propName}, please open an issue.`)
         }
-        quasar.loading?.setDefaults(getUpdatedDefaults(
-          config.loading || {},
-          prevConfig.loading || {},
-        ))
-        quasar.loadingBar?.setDefaults(getUpdatedDefaults(
-          config.loadingBar || {},
-          prevConfig.loadingBar || {},
-        ))
-        plugins.Notify?.setDefaults(getUpdatedDefaults(
-          config.loadingBar || {},
-          prevConfig.loadingBar || {},
-        ))
-      },
-      { deep: true },
-    )
-  }
+      }
+    }
 
-  return {
-    provide: {
-      q: quasar,
-    },
-  }
+    if (import.meta.dev && import.meta.client) {
+      watch(
+        () => quasarAppConfig,
+        (newAppConfig) => {
+          const prevConfig = config
+          config = defuFn(newAppConfig, quasarNuxtConfig.config)
+          quasar.addressbarColor?.set(config.addressbarColor || getPrimaryColor())
+          const modifiedBrand = getUpdatedDefaults(
+            config.brand || {},
+            prevConfig.brand || {},
+          )
+          for (const [name, color] of Object.entries(modifiedBrand)) {
+            if (!color) {
+              document.body.style.removeProperty(`--q-${name}`)
+            }
+            else {
+              document.body.style.setProperty(`--q-${name}`, color)
+            }
+          }
+          if (prevConfig.dark !== config.dark) {
+            quasar.dark.set(config.dark || false)
+          }
+          quasar.loading?.setDefaults(getUpdatedDefaults(
+            config.loading || {},
+            prevConfig.loading || {},
+          ))
+          quasar.loadingBar?.setDefaults(getUpdatedDefaults(
+            config.loadingBar || {},
+            prevConfig.loadingBar || {},
+          ))
+          plugins.Notify?.setDefaults(getUpdatedDefaults(
+            config.loadingBar || {},
+            prevConfig.loadingBar || {},
+          ))
+        },
+        { deep: true },
+      )
+    }
+
+    return {
+      provide: {
+        q: quasar,
+      },
+    }
+  },
 })
