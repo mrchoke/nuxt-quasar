@@ -1,5 +1,18 @@
 # Changelog
 
+## v3.0.1
+
+[compare changes](https://github.com/Maiquu/nuxt-quasar/compare/v3.0.0...v3.0.1)
+
+### 🩹 Fixes
+
+- Explicitly name quasar plugin ([ee384d4](https://github.com/Maiquu/nuxt-quasar/commit/ee384d4))
+- Ensure virtual plugins use \0 prefix for resolution ([044af20](https://github.com/Maiquu/nuxt-quasar/commit/044af20))
+
+### ❤️ Contributors
+
+- Ege İliklier ([@Maiquu](https://github.com/Maiquu))
+
 ## v3.0.0
 
 [compare changes](https://github.com/Maiquu/nuxt-quasar/compare/v3.0.0-rc.3...v3.0.0)
