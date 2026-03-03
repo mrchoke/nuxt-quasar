@@ -3,7 +3,7 @@ import semver from 'semver'
 import type { ModuleContext } from '../../types'
 
 const QUASAR_ENTRY = 'quasar'
-const QUASAR_VIRTUAL_ENTRY = '/__quasar/entry.mjs'
+const QUASAR_VIRTUAL_ENTRY = '\0/__quasar/entry.mjs'
 
 export function virtualQuasarEntryPlugin(context: ModuleContext): VitePlugin {
   const { resolveQuasar, quasarVersion } = context

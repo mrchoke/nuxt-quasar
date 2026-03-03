@@ -5,7 +5,7 @@ import type { ModuleContext } from '../../types'
 import { uniq } from '../../utils'
 
 // Add css suffix so loaded string can be interpreted as a css file
-const RESOLVED_ID = '/__quasar/animations.css'
+const RESOLVED_ID = '\0/__quasar/animations.css'
 const RESOLVED_ID_WITH_QUERY_RE = /([/\\])__quasar\1animations\.css(\?.*)?$/
 
 export function virtualAnimationsPlugin({ options, resolveQuasarExtras }: ModuleContext): VitePlugin {
