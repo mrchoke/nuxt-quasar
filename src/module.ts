@@ -1,23 +1,23 @@
-import { dirname, resolve } from 'node:path'
 import { addComponent, addImports, addImportsSources, addPlugin, addTemplate, addTypeTemplate, createResolver, defineNuxtModule, resolvePath } from '@nuxt/kit'
 import type { ViteConfig } from '@nuxt/schema'
+import { parseNodeModulePath } from 'mlly'
+import { dirname, resolve } from 'node:path'
 import type { QuasarAnimations, QuasarFonts, QuasarIconSets as QuasarIconSet, QuasarIconSet as QuasarIconSetObject, QuasarLanguageCodes, QuasarPlugins } from 'quasar'
 import type { AssetURLOptions } from 'vue/compiler-sfc'
-import { parseNodeModulePath } from 'mlly'
 import { version } from '../package.json'
 import { transformDirectivesPlugin } from './plugins/transform/directives'
-import type { ModuleContext, QuasarFontIconSet, QuasarImportData, QuasarImports, QuasarSvgIconSet, QuasarUIConfiguration, ResolveFn } from './types'
 import { transformScssPlugin } from './plugins/transform/scss'
-import { kebabCase, readFileMemoized, readJSON, uniq } from './utils'
-import { virtualQuasarEntryPlugin } from './plugins/virtual/entry'
 import { virtualAnimationsPlugin } from './plugins/virtual/animations'
 import { virtualBrandPlugin } from './plugins/virtual/brand'
+import { virtualQuasarEntryPlugin } from './plugins/virtual/entry'
 import { setupCss } from './setupCss'
 import { generateTemplateQuasarConfig } from './template/config'
 import { generateTemplateShims } from './template/shims'
+import type { ModuleContext, QuasarFontIconSet, QuasarImportData, QuasarImports, QuasarSvgIconSet, QuasarUIConfiguration, ResolveFn } from './types'
+import { kebabCase, readFileMemoized, readJSON, uniq } from './utils'
 
 /* eslint-disable-next-line */ // This interface will be augmented after `nuxt prepare`
-export interface QuasarComponentDefaults {}
+export interface QuasarComponentDefaults { }
 
 export type { QuasarUIConfiguration }
 
@@ -139,7 +139,7 @@ export default defineNuxtModule<ModuleOptions>({
     plugins: [],
     extras: {},
   },
-  async setup(options, nuxt) {
+  async setup (options, nuxt) {
     const { resolve: resolveLocal } = createResolver(import.meta.url)
     const { resolve: resolveQuasar } = createResolver(dirname(await resolvePath('quasar/package.json')))
     const { resolve: resolveQuasarExtras } = createResolver(dirname(await resolvePath('@quasar/extras/package.json')))
@@ -312,11 +312,11 @@ export default defineNuxtModule<ModuleOptions>({
   },
 })
 
-function isFontIconSet(iconSet: QuasarIconSet): iconSet is QuasarFontIconSet {
+function isFontIconSet (iconSet: QuasarIconSet): iconSet is QuasarFontIconSet {
   return !iconSet.startsWith('svg-')
 }
 
-function categorizeImports(importMap: Record<string, string>, quasarResolve: ResolveFn): QuasarImports {
+function categorizeImports (importMap: Record<string, string>, quasarResolve: ResolveFn): QuasarImports {
   const imports: QuasarImports = {
     raw: importMap,
     components: [],
@@ -352,22 +352,45 @@ function categorizeImports(importMap: Record<string, string>, quasarResolve: Res
 
 const iconDeclarationPattern = /^export declare const ([a-zA-Z\d]+): string;?$/gm
 
-async function getIconsFromIconset(iconSet: QuasarSvgIconSet, resolveQuasarExtras: ResolveFn): Promise<string[]> {
-  try {
-    const icons = await readJSON(resolveQuasarExtras(`${iconSet}/icons.json`)) as string[]
-    return icons
-  }
-  catch {
-    // Some icon sets does not provide `icons.json`, so we check `index.d.ts`
-    const path = resolveQuasarExtras(`${iconSet}/index.d.ts`)
-    const dts = await readFileMemoized(path)
-    const icons = [...dts.matchAll(iconDeclarationPattern)].map(arr => arr[1]!)
+type ErrorWithCode = Error & { code?: string }
 
-    return icons
-  }
+function isFileNotFoundError (error: unknown): error is ErrorWithCode {
+  return error instanceof Error && (error as ErrorWithCode).code === 'ENOENT'
 }
 
-async function getSassVersion(): Promise<string | null> {
+async function getIconsFromIconset (iconSet: QuasarSvgIconSet, resolveQuasarExtras: ResolveFn): Promise<string[]> {
+  const iconSetPaths = [iconSet, `exports/${iconSet}`]
+
+  for (const path of iconSetPaths) {
+    try {
+      const icons = await readJSON(resolveQuasarExtras(`${path}/icons.json`)) as string[]
+      return icons
+    }
+    catch (error) {
+      if (!isFileNotFoundError(error)) {
+        throw error
+      }
+    }
+  }
+
+  // Some icon sets do not provide `icons.json`, so we check `index.d.ts`.
+  for (const path of iconSetPaths) {
+    try {
+      const dts = await readFileMemoized(resolveQuasarExtras(`${path}/index.d.ts`))
+      const icons = [...dts.matchAll(iconDeclarationPattern)].map(arr => arr[1]!)
+      return icons
+    }
+    catch (error) {
+      if (!isFileNotFoundError(error)) {
+        throw error
+      }
+    }
+  }
+
+  throw new Error(`Unable to resolve icon metadata for "${iconSet}" from @quasar/extras`)
+}
+
+async function getSassVersion (): Promise<string | null> {
   try {
     const sassEntry = await resolvePath('sass')
     const modulePath = parseNodeModulePath(sassEntry)

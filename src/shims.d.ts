@@ -6,9 +6,17 @@ declare module '@quasar/extras/animate/animate-list.mjs' {
   export const outAnimations: QuasarOutAnimations[]
 }
 
+declare module '@quasar/extras/animate/animate-list.common' {
+  import type { QuasarGeneralAnimations, QuasarInAnimations, QuasarOutAnimations } from 'quasar'
+
+  export const generalAnimations: QuasarGeneralAnimations[]
+  export const inAnimations: QuasarInAnimations[]
+  export const outAnimations: QuasarOutAnimations[]
+}
+
 declare module '#build/quasar.config.mjs' {
+  import type { AddressbarColor, Loading, LoadingBar, Notify, QuasarIconSet, QuasarLanguage, QuasarUIConfiguration } from 'quasar'
   import type { Prop } from 'vue'
-  import type { QuasarLanguage, QuasarIconSet, QuasarUIConfiguration, AddressbarColor, Notify, Loading, LoadingBar } from 'quasar'
 
   export const componentsWithDefaults: Record<string, { props: Record<string, Prop<unknown> | null> }>
 

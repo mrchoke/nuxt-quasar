@@ -34,7 +34,7 @@
     "test:types": "vue-tsc --noEmit && cd playground && vue-tsc --noEmit"
   },
   "peerDependencies": {
-    "@quasar/extras": "^1",
+    "@quasar/extras": "^1 || ^2",
     "quasar": "^2.8.0"
   },
   "dependencies": {
