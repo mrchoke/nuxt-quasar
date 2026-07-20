@@ -30,39 +30,17 @@ export function virtualQuasarEntryPlugin(context: ModuleContext): VitePlugin {
         config.ssr.noExternal = toArray(config.ssr.noExternal)
         config.ssr.noExternal.push(/\/node_modules\/quasar\/src\//)
       }
-
-      config.resolve ??= {}
-      const replacement = context.dev
-        ? context.mode === 'client'
-          ? clientEntry
-          : serverEntry
-        : QUASAR_VIRTUAL_ENTRY
-      const aliasEntries = [
-        {
-          find: /^quasar$/,
-          replacement,
-        },
-      ]
-
-      if (context.mode === 'server') {
-        aliasEntries.push({
-          find: /^quasar\/dist\/quasar\.client(\.prod)?\.js$/,
-          replacement: serverEntry,
-        })
-      }
-
-      if (Array.isArray(config.resolve.alias)) {
-        config.resolve.alias.push(...aliasEntries)
-      }
-      else {
-        config.resolve.alias = [
-          ...Object.entries(config.resolve.alias || {}).map(([find, replacement]) => ({ find, replacement })),
-          ...aliasEntries,
-        ]
-      }
     },
 
-    resolveId(id) {
+    resolveId(id, _importer, options) {
+      const isSsrResolve = options?.ssr === true
+      if (context.mode === 'server' && !isSsrResolve) {
+        return
+      }
+      if (context.mode === 'client' && isSsrResolve) {
+        return
+      }
+
       if (context.mode === 'server' && isQuasarClientEntryId(id)) {
         return {
           id: serverEntry,
