@@ -22,10 +22,10 @@ export function generateTemplateQuasarConfig(context: Omit<ModuleContext, 'mode'
   return `\
 ${when(lang, () => `import lang from "quasar/lang/${lang}${ext}"`)}
 ${when(typeof iconSet === 'string', () => `import iconSet from "quasar/icon-set/${iconSet}${ext}"`)}
-${when(plugins.length, () => `import { ${plugins} } from "quasar"`)}
-${when(componentsWithDefaults.length, () => `import { ${componentsWithDefaults} } from "quasar"`)}
 
-export const componentsWithDefaults = { ${componentsWithDefaults} }
+export const pluginNames = ${JSON.stringify(plugins)}
+
+export const componentsWithDefaults = ${JSON.stringify(componentsWithDefaults)}
 
 export const appConfigKey = ${JSON.stringify(context.options.appConfigKey)}
 
@@ -35,9 +35,7 @@ export const quasarNuxtConfig = {
     ? 'iconSet'
     : `iconSet: ${iconSet ? JSON.stringify(iconSet) : '"material-icons"'}`},
   components: ${JSON.stringify(components || {})},
-  plugins: {${
-    plugins.join(',') || ''
-  }},
+  plugins: pluginNames,
   ${when(config, () => `config: ${JSON.stringify(config)}`)}
 }`
 }

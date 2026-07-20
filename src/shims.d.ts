@@ -15,22 +15,17 @@ declare module '@quasar/extras/animate/animate-list.common' {
 }
 
 declare module '#build/quasar.config.mjs' {
-  import type { AddressbarColor, Loading, LoadingBar, Notify, QuasarIconSet, QuasarLanguage, QuasarUIConfiguration } from 'quasar'
-  import type { Prop } from 'vue'
+  import type { QuasarIconSet, QuasarLanguage, QuasarUIConfiguration } from 'quasar'
 
-  export const componentsWithDefaults: Record<string, { props: Record<string, Prop<unknown> | null> }>
+  export const componentsWithDefaults: string[]
+  export const pluginNames: string[]
 
   export const quasarNuxtConfig: {
     lang?: QuasarLanguage
     iconSet: QuasarIconSet
     config?: QuasarUIConfiguration
     components: { defaults?: Record<string, Record<string, unknown>> }
-    plugins: { // Plugins with configurable defaults that are required to be explicity set
-      AddressbarColor?: AddressbarColor
-      Loading?: Loading
-      LoadingBar?: LoadingBar
-      Notify?: Notify
-    }
+    plugins: string[]
   }
 
   export const appConfigKey: string

@@ -1,12 +1,11 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
-import { Quasar, useQuasar } from 'quasar'
 import type { ReactiveHead } from '@unhead/vue'
 import type { QVueGlobals, QuasarIconSet, QuasarLanguage, QuasarUIConfiguration } from 'quasar'
 import type { App as VueApp } from 'vue'
 import { defuFn } from 'defu'
 import { defineNuxtPlugin } from '#app'
 import { computed, reactive, useAppConfig, useHead, watch } from '#imports'
-import { appConfigKey, componentsWithDefaults, quasarNuxtConfig } from '#build/quasar.config.mjs'
+import { appConfigKey, componentsWithDefaults, pluginNames, quasarNuxtConfig } from '#build/quasar.config.mjs'
 
 interface QuasarPluginClientContext {
   parentApp: VueApp
@@ -73,9 +72,26 @@ function omit(object: Record<string, unknown>, keys: string[]): Record<string, u
 
 export default defineNuxtPlugin({
   name: 'quasar',
-  setup(nuxt) {
+  async setup(nuxt) {
+    const quasarModule = import.meta.server
+      ? await import('quasar/dist/quasar.server.prod.js') as typeof import('quasar')
+      : await import('quasar')
+    const { Quasar } = quasarModule
+    const quasarRuntimeExports = quasarModule as Record<string, unknown>
+    const resolvedPlugins = Object.fromEntries(
+      pluginNames
+        .map(name => [name, quasarRuntimeExports[name]])
+        .filter(([, plugin]) => plugin !== undefined),
+    )
+    const resolvedComponentsWithDefaults = Object.fromEntries(
+      componentsWithDefaults
+        .map(name => [name, quasarRuntimeExports[name]])
+        .filter(([, component]) => component !== undefined),
+    ) as Record<string, { props: Record<string, any> }>
+    const notifyPlugin = resolvedPlugins.Notify as { setDefaults?: (config: Record<string, unknown>) => void } | undefined
+
     const quasarAppConfig = useAppConfig()[appConfigKey] as QuasarUIConfiguration & { addressbarColor?: string }
-    const { lang, iconSet, plugins, components } = quasarNuxtConfig
+    const { lang, iconSet, components } = quasarNuxtConfig
     let ssrContext: { req: IncomingMessage, res: ServerResponse } | undefined
     let quasarProxy: QuasarServerPlugin | QuasarClientPlugin
     // Since brand used in `nuxt.config` is pushed to `nuxt.options.css`, we exclude it here
@@ -154,17 +170,24 @@ export default defineNuxtPlugin({
       iconSet,
       plugins: {
         quasarProxy,
-        ...plugins,
+        ...resolvedPlugins,
       },
       config,
     }, ssrContext)
 
-    const quasar = useQuasar()
+    const quasar = nuxt.vueApp.config.globalProperties.$q as QVueGlobals | undefined
+    if (!quasar) {
+      return {
+        provide: {
+          q: undefined,
+        },
+      }
+    }
 
     const asDefault = (value: unknown) => (value && typeof value === 'object') ? () => value : value
 
     for (const [name, propDefaults] of Object.entries(components.defaults || {})) {
-      const component = componentsWithDefaults[name]
+      const component = resolvedComponentsWithDefaults[name]
       if (!component) {
         continue
       }
@@ -223,7 +246,7 @@ export default defineNuxtPlugin({
             config.loadingBar || {},
             prevConfig.loadingBar || {},
           ))
-          plugins.Notify?.setDefaults(getUpdatedDefaults(
+          notifyPlugin?.setDefaults(getUpdatedDefaults(
             config.loadingBar || {},
             prevConfig.loadingBar || {},
           ))
