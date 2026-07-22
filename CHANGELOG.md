@@ -1,5 +1,14 @@
 # Changelog
 
+## v3.0.5
+
+[compare changes](https://github.com/Maiquu/nuxt-quasar/compare/v3.0.1...v3.0.5)
+
+### 🩹 Fixes
+
+- Support Quasar v2.22 type exports by sourcing animation/font types from `@quasar/extras`
+- Update dev baseline to Quasar v2.22.0 and `@quasar/extras` v2.0.2
+
 ## v3.0.1
 
 [compare changes](https://github.com/Maiquu/nuxt-quasar/compare/v3.0.0...v3.0.1)

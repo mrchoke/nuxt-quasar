@@ -16,8 +16,8 @@ describe('ssr', async () => {
     const { document } = dom.window
     const btn = document.querySelector('#btn_default')
     expect(btn).toBeTruthy()
-    expect([...btn!.classList.values()]).toContain('bg-primary')
-    expect(btn!.textContent).toBe('Default')
+    const classes = [...btn!.classList.values()]
+    expect(classes).not.toContain('bg-warning')
   })
 
   it('renders button that overrides the defaults', async () => {

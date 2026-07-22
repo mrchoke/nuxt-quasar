@@ -13,6 +13,7 @@ export default defineNuxtConfig({
     },
   },
   compatibilityDate: '2024-08-08',
+  // @ts-ignore Local module option augmentation resolves at prepare/build time.
   quasar: {
     plugins: [
       'AppFullscreen',

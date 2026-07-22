@@ -4,6 +4,7 @@ export default defineNuxtConfig({
   modules: [
     QuasarModule,
   ],
+  // @ts-ignore Local module option augmentation resolves at prepare/build time.
   quasar: {
     components: {
       defaults: {

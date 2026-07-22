@@ -1,4 +1,4 @@
-import type { QuasarFonts } from 'quasar'
+import type { QuasarFonts } from '@quasar/extras'
 import { logger } from '@nuxt/kit'
 import { quasarAnimationsPath, quasarBrandPath, quasarCssPath, quasarFontsPath, quasarIconsPath } from './constants'
 import type { ModuleOptions } from './module'

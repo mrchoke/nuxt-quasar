@@ -1,5 +1,5 @@
 declare module '@quasar/extras/animate/animate-list.mjs' {
-  import type { QuasarGeneralAnimations, QuasarInAnimations, QuasarOutAnimations } from 'quasar'
+  import type { QuasarGeneralAnimations, QuasarInAnimations, QuasarOutAnimations } from '@quasar/extras'
 
   export const generalAnimations: QuasarGeneralAnimations[]
   export const inAnimations: QuasarInAnimations[]
@@ -7,7 +7,7 @@ declare module '@quasar/extras/animate/animate-list.mjs' {
 }
 
 declare module '@quasar/extras/animate/animate-list.common' {
-  import type { QuasarGeneralAnimations, QuasarInAnimations, QuasarOutAnimations } from 'quasar'
+  import type { QuasarGeneralAnimations, QuasarInAnimations, QuasarOutAnimations } from '@quasar/extras'
 
   export const generalAnimations: QuasarGeneralAnimations[]
   export const inAnimations: QuasarInAnimations[]
@@ -43,4 +43,8 @@ declare module 'quasar/src/vue-plugin.js' {
 
   const Quasar: Plugin
   export = Quasar
+}
+
+declare module 'quasar/dist/quasar.server.prod.js' {
+  export * from 'quasar'
 }

@@ -70,11 +70,11 @@ function omit(object: Record<string, unknown>, keys: string[]): Record<string, u
   }, {} as Record<string, unknown>)
 }
 
-export default defineNuxtPlugin({
+export default defineNuxtPlugin<{ q: QVueGlobals | undefined }>({
   name: 'quasar',
   async setup(nuxt) {
     const quasarModule = import.meta.server
-      ? await import('quasar/dist/quasar.server.prod.js') as typeof import('quasar')
+      ? await import('quasar/dist/quasar.server.prod.js') as unknown as typeof import('quasar')
       : await import('quasar')
     const { Quasar } = quasarModule
     const quasarRuntimeExports = quasarModule as Record<string, unknown>
@@ -87,7 +87,7 @@ export default defineNuxtPlugin({
       componentsWithDefaults
         .map(name => [name, quasarRuntimeExports[name]])
         .filter(([, component]) => component !== undefined),
-    ) as Record<string, { props: Record<string, any> }>
+    ) as Record<string, { props: Record<string, unknown> }>
     const notifyPlugin = resolvedPlugins.Notify as { setDefaults?: (config: Record<string, unknown>) => void } | undefined
 
     const quasarAppConfig = useAppConfig()[appConfigKey] as QuasarUIConfiguration & { addressbarColor?: string }
@@ -201,8 +201,9 @@ export default defineNuxtPlugin({
           }
         }
         else if (typeof propConfig === 'object') {
-          if (propConfig) {
-            propConfig.default = asDefault(defaultValue)
+          const propObject = propConfig as { default?: unknown } | null
+          if (propObject) {
+            propObject.default = asDefault(defaultValue)
           }
           else {
             component.props[propName] = {
@@ -246,7 +247,7 @@ export default defineNuxtPlugin({
             config.loadingBar || {},
             prevConfig.loadingBar || {},
           ))
-          notifyPlugin?.setDefaults(getUpdatedDefaults(
+          notifyPlugin?.setDefaults?.(getUpdatedDefaults(
             config.loadingBar || {},
             prevConfig.loadingBar || {},
           ))

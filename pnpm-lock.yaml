@@ -43,8 +43,8 @@ importers:
         specifier: ^3.20.1
         version: 3.20.1(jsdom@27.2.0)(magicast@0.5.1)(typescript@5.9.3)(vitest@3.2.4(@types/node@24.10.1)(jiti@2.6.1)(jsdom@27.2.0)(sass@1.94.2)(terser@5.44.1)(yaml@2.8.1))
       '@quasar/extras':
-        specifier: ^1.17.0
-        version: 1.17.0
+        specifier: ^2.0.2
+        version: 2.0.2
       '@types/jsdom':
         specifier: ^27.0.0
         version: 27.0.0
@@ -64,8 +64,8 @@ importers:
         specifier: ^4.2.1
         version: 4.2.1(@parcel/watcher@2.5.1)(@types/node@24.10.1)(@vue/compiler-sfc@3.5.25)(db0@0.3.4)(eslint@9.39.1(jiti@2.6.1))(ioredis@5.8.2)(magicast@0.5.1)(optionator@0.9.4)(rollup@4.53.3)(sass@1.94.2)(terser@5.44.1)(typescript@5.9.3)(vite@7.2.4(@types/node@24.10.1)(jiti@2.6.1)(sass@1.94.2)(terser@5.44.1)(yaml@2.8.1))(vue-tsc@3.1.5(typescript@5.9.3))(yaml@2.8.1)
       quasar:
-        specifier: ^2.18.6
-        version: 2.18.6
+        specifier: ^2.22.0
+        version: 2.22.0
       sass:
         specifier: ^1.94.2
         version: 1.94.2
@@ -1063,8 +1063,8 @@ packages:
   '@poppinss/exception@1.2.2':
     resolution: {integrity: sha512-m7bpKCD4QMlFCjA/nKTs23fuvoVFoA83brRKmObCUNmi/9tVu8Ve3w4YQAnJu4q3Tjf5fr685HYIC/IA2zHRSg==}
 
-  '@quasar/extras@1.17.0':
-    resolution: {integrity: sha512-KqAHdSJfIDauiR1nJ8rqHWT0diqD0QradZKoVIZJAilHAvgwyPIY7MbyR2z4RIMkUIMUSqBZcbshMpEw+9A30w==}
+  '@quasar/extras@2.0.2':
+    resolution: {integrity: sha512-BkH/iBISDbLNl5qAdsVNpa/0hxHbd1VwfML4dRwTUb8oGeLqlr00yjYM648KGYB1C8plwhU7LyGziE1JpSa6ZA==}
 
   '@rolldown/pluginutils@1.0.0-beta.50':
     resolution: {integrity: sha512-5e76wQiQVeL1ICOZVUg4LSOVYg9jyhGCin+icYozhsUzM+fHE7kddi1bdiE0jwVqTfkjba3jUFbEkoC9WkdvyA==}
@@ -3394,8 +3394,8 @@ packages:
   quansync@0.2.11:
     resolution: {integrity: sha512-AifT7QEbW9Nri4tAwR5M/uzpBuqfZf+zwaEM/QkzEjj7NBuFD2rBuy0K3dE+8wltbezDV7JMA0WfnCPYRSYbXA==}
 
-  quasar@2.18.6:
-    resolution: {integrity: sha512-ZlK+vJXOBPSFDCNQDBDNwSI+AHoqaFPxK8ve6mhsYLhMKWI5b8zsGY9VU1xYjngO2aBvU4fvGWXy4tTbzrBk8Q==}
+  quasar@2.22.0:
+    resolution: {integrity: sha512-0WAJ0ZnNMWK7QNFnpOVLyUDeEZ6cexkO+f7GjOEEIITIynH2xkfuryWO97Pa/G/+eQJc0ZwX9GohEXXwYTIBew==}
     engines: {node: '>= 10.18.1', npm: '>= 6.13.4', yarn: '>= 1.21.1'}
 
   queue-microtask@1.2.3:
@@ -5431,7 +5431,7 @@ snapshots:
 
   '@poppinss/exception@1.2.2': {}
 
-  '@quasar/extras@1.17.0': {}
+  '@quasar/extras@2.0.2': {}
 
   '@rolldown/pluginutils@1.0.0-beta.50': {}
 
@@ -8000,7 +8000,7 @@ snapshots:
 
   quansync@0.2.11: {}
 
-  quasar@2.18.6: {}
+  quasar@2.22.0: {}
 
   queue-microtask@1.2.3: {}
 
