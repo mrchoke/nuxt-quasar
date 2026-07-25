@@ -1,7 +1,7 @@
 {
   "name": "nuxt-quasar-ui",
   "type": "module",
-  "version": "3.0.5",
+  "version": "3.0.6",
   "packageManager": "pnpm@10.24.0",
   "description": "Quasar Module for Nuxt (Unofficial)",
   "license": "MIT",
@@ -38,33 +38,33 @@
     "quasar": "^2.8.0"
   },
   "dependencies": {
-    "@nuxt/kit": "^4.2.1",
-    "defu": "^6.1.4",
+    "@nuxt/kit": "^4.5.0",
+    "defu": "^6.1.7",
     "magic-string": "^0.30.21",
-    "mlly": "^1.8.0",
+    "mlly": "^1.8.2",
     "p-memoize": "^8.0.0",
-    "semver": "^7.7.3"
+    "semver": "^7.8.5"
   },
   "devDependencies": {
-    "@nuxt/devtools": "^3.1.1",
-    "@nuxt/eslint-config": "^1.11.0",
-    "@nuxt/module-builder": "^1.0.2",
-    "@nuxt/schema": "^4.2.1",
-    "@nuxt/test-utils": "^3.20.1",
+    "@nuxt/devtools": "^3.3.1",
+    "@nuxt/eslint-config": "^1.16.0",
+    "@nuxt/module-builder": "^1.0.3",
+    "@nuxt/schema": "^4.5.0",
+    "@nuxt/test-utils": "^3.23.0",
     "@quasar/extras": "^2.0.2",
     "@types/jsdom": "^27.0.0",
     "@types/semver": "^7.7.1",
     "changelogen": "^0.6.2",
-    "eslint": "^9.39.1",
-    "jsdom": "^27.2.0",
-    "nuxt": "^4.2.1",
-    "quasar": "^2.22.0",
-    "sass": "^1.94.2",
+    "eslint": "^9.39.5",
+    "jsdom": "^27.4.0",
+    "nuxt": "^4.5.0",
+    "quasar": "^2.23.1",
+    "sass": "^1.102.0",
     "typescript": "^5.9.3",
-    "vite": "^7.2.4",
-    "vitest": "^3.2.4",
-    "vue": "^3.5.25",
-    "vue-tsc": "^3.1.5"
+    "vite": "^7.3.6",
+    "vitest": "^3.2.7",
+    "vue": "^3.5.40",
+    "vue-tsc": "^3.3.8"
   },
   "pnpm": {
     "peerDependencyRules": {

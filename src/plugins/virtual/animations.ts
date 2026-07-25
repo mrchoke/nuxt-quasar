@@ -1,5 +1,5 @@
-import { readFile } from 'node:fs/promises'
 import type { QuasarGeneralAnimations, QuasarInAnimations, QuasarOutAnimations } from '@quasar/extras'
+import { readFile } from 'node:fs/promises'
 import type { Plugin as VitePlugin } from 'vite'
 import { quasarAnimationsPath } from '../../constants'
 import type { ModuleContext } from '../../types'

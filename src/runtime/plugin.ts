@@ -1,11 +1,11 @@
-import type { IncomingMessage, ServerResponse } from 'node:http'
+import { defineNuxtPlugin } from '#app'
+import { appConfigKey, componentsWithDefaults, pluginNames, quasarNuxtConfig } from '#build/quasar.config.mjs'
+import { computed, reactive, useAppConfig, useHead, watch } from '#imports'
 import type { ReactiveHead } from '@unhead/vue'
+import { defuFn } from 'defu'
+import type { IncomingMessage, ServerResponse } from 'node:http'
 import type { QVueGlobals, QuasarIconSet, QuasarLanguage, QuasarUIConfiguration } from 'quasar'
 import type { App as VueApp } from 'vue'
-import { defuFn } from 'defu'
-import { defineNuxtPlugin } from '#app'
-import { computed, reactive, useAppConfig, useHead, watch } from '#imports'
-import { appConfigKey, componentsWithDefaults, pluginNames, quasarNuxtConfig } from '#build/quasar.config.mjs'
 
 interface QuasarPluginClientContext {
   parentApp: VueApp
@@ -41,14 +41,14 @@ interface QuasarSSRContext {
 }
 
 interface QuasarServerPlugin {
-  install(context: QuasarPluginServerContext): void
+  install (context: QuasarPluginServerContext): void
 }
 
 interface QuasarClientPlugin {
-  install(context: QuasarPluginClientContext): void
+  install (context: QuasarPluginClientContext): void
 }
 
-function getUpdatedDefaults<T extends object>(cfg: T, prevCfg: T) {
+function getUpdatedDefaults<T extends object> (cfg: T, prevCfg: T) {
   const prevKeys = Object.keys(prevCfg)
   return {
     ...Object.fromEntries(prevKeys.map(k => [k, undefined])),
@@ -56,12 +56,12 @@ function getUpdatedDefaults<T extends object>(cfg: T, prevCfg: T) {
   }
 }
 
-function getPrimaryColor() {
+function getPrimaryColor () {
   return getComputedStyle(document.body).getPropertyValue('--q-primary').trim()
 }
 
-function omit<T extends object, K extends keyof T & string>(object: T, keys: K[]): Omit<T, K>
-function omit(object: Record<string, unknown>, keys: string[]): Record<string, unknown> {
+function omit<T extends object, K extends keyof T & string> (object: T, keys: K[]): Omit<T, K>
+function omit (object: Record<string, unknown>, keys: string[]): Record<string, unknown> {
   return Object.keys(object).reduce((output, key) => {
     if (!keys.includes(key)) {
       output[key] = object[key]
@@ -72,7 +72,7 @@ function omit(object: Record<string, unknown>, keys: string[]): Record<string, u
 
 export default defineNuxtPlugin<{ q: QVueGlobals | undefined }>({
   name: 'quasar',
-  async setup(nuxt) {
+  async setup (nuxt) {
     const quasarModule = import.meta.server
       ? await import('quasar/dist/quasar.server.prod.js') as unknown as typeof import('quasar')
       : await import('quasar')
@@ -133,15 +133,15 @@ export default defineNuxtPlugin<{ q: QVueGlobals | undefined }>({
         res: nuxt.ssrContext!.event.node.res,
       }
       quasarProxy = {
-        install({ ssrContext }) {
+        install ({ ssrContext }) {
           meta.bodyClasses = ssrContext._meta.bodyClasses
           meta.htmlAttrs = ssrContext._meta.htmlAttrs
           meta.endingHeadTags = ssrContext._meta.endingHeadTags
           ssrContext._meta = new Proxy({} as Record<string | symbol, unknown>, {
-            get(target, key) {
+            get (target, key) {
               return meta[key as MetaKey] ?? target[key]
             },
-            set(target, key, value) {
+            set (target, key, value) {
               if (typeof meta[key as MetaKey] === 'string') {
                 meta[key as MetaKey] = value
               }
@@ -156,7 +156,7 @@ export default defineNuxtPlugin<{ q: QVueGlobals | undefined }>({
     }
     else {
       quasarProxy = {
-        install({ onSSRHydrated }) {
+        install ({ onSSRHydrated }) {
           nuxt.hook('app:suspense:resolve', () => {
             onSSRHydrated.forEach(fn => fn())
           })

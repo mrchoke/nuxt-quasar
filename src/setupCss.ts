@@ -1,5 +1,5 @@
-import type { QuasarFonts } from '@quasar/extras'
 import { logger } from '@nuxt/kit'
+import type { QuasarFonts } from '@quasar/extras'
 import { quasarAnimationsPath, quasarBrandPath, quasarCssPath, quasarFontsPath, quasarIconsPath } from './constants'
 import type { ModuleOptions } from './module'
 import type { QuasarFontIconSet } from './types'
@@ -19,7 +19,7 @@ import { uniq } from './utils'
  * @param css
  * @param options
  */
-export function setupCss(css: string[], options: ModuleOptions) {
+export function setupCss (css: string[], options: ModuleOptions) {
   const brand = options.config?.brand || {}
   if (css.includes(quasarBrandPath)) {
     logger.warn('Re-ordering "quasar/brand" is deprecated. In a future version, brand variables will always be defined in body tag.')
@@ -73,10 +73,10 @@ export function setupCss(css: string[], options: ModuleOptions) {
   return css
 }
 
-function resolveFontIcon(icon: QuasarFontIconSet): string {
+function resolveFontIcon (icon: QuasarFontIconSet): string {
   return `@quasar/extras/${icon}/${icon}.css`
 }
 
-function resolveFont(font: QuasarFonts): string {
+function resolveFont (font: QuasarFonts): string {
   return `@quasar/extras/${font}/${font}.css`
 }
