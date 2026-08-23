@@ -304,7 +304,7 @@ function virtualQuasarEntryPlugin(context) {
     },
     async load(id) {
       if (!context.dev && id === QUASAR_VIRTUAL_ENTRY)
-        return Object.entries(context.imports.raw).filter(([, path]) => !path.includes("/__tests__/")).map(([name, path]) => `export { default as ${name} } from "quasar/${path}"`).join("\n");
+        return Object.entries(context.imports.raw).filter(([name, path]) => !name.includes(".") && !path.includes("/__tests__/")).map(([name, path]) => `export { default as ${name} } from "quasar/${path}"`).join("\n");
     }
   };
 }

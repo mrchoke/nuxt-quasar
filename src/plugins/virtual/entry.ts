@@ -64,7 +64,9 @@ export function virtualQuasarEntryPlugin(context: ModuleContext): VitePlugin {
       if (!context.dev && id === QUASAR_VIRTUAL_ENTRY)
         return Object
           .entries(context.imports.raw)
-          .filter(([, path]) => !path.includes('/__tests__/'))
+          // Quasar >= 2.26 ships dotted export names such as
+          // "QBtn.hydration.fixtures" which are not valid JS identifiers.
+          .filter(([name, path]) => !name.includes('.') && !path.includes('/__tests__/'))
           .map(([name, path]) => `export { default as ${name} } from "quasar/${path}"`)
           .join('\n')
     },
