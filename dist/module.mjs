@@ -7,7 +7,7 @@ import { readFile } from 'node:fs/promises';
 import pMemoize from 'p-memoize';
 import semver from 'semver';
 
-const version = "3.0.6";
+const version = "3.0.7";
 
 const directivesRegExp = /(?<=[ (])_?resolveDirective\(\s*["']([^'"]*)["'][^)]*\)/g;
 function transformDirectivesPlugin(context) {
@@ -304,7 +304,7 @@ function virtualQuasarEntryPlugin(context) {
     },
     async load(id) {
       if (!context.dev && id === QUASAR_VIRTUAL_ENTRY)
-        return Object.entries(context.imports.raw).filter(([name, path]) => !name.includes(".") && !path.includes("/__tests__/")).map(([name, path]) => `export { default as ${name} } from "quasar/${path}"`).join("\n");
+        return Object.entries(context.imports.raw).filter(([, path]) => !path.includes("/__tests__/")).map(([name, path]) => `export { default as ${name} } from "quasar/${path}"`).join("\n");
     }
   };
 }
@@ -362,6 +362,37 @@ function resolveFontIcon(icon) {
 }
 function resolveFont(font) {
   return `@quasar/extras/${font}/${font}.css`;
+}
+
+const VALID_IDENTIFIER_RE = /^[A-Z_$][\w$]*$/i;
+function categorizeImports(importMap, quasarResolve) {
+  const entries = Object.entries(importMap).filter(([name]) => VALID_IDENTIFIER_RE.test(name));
+  const imports = {
+    raw: Object.fromEntries(entries),
+    components: [],
+    composables: [],
+    directives: [],
+    plugins: []
+  };
+  for (const [name, path] of entries) {
+    const importData = {
+      name,
+      path: quasarResolve(path)
+    };
+    if (path.includes("/components/") && !path.includes("/__tests__/")) {
+      imports.components.push(importData);
+    } else if (path.includes("/composables/")) {
+      imports.composables.push(importData);
+    } else if (path.includes("/directives/")) {
+      imports.directives.push({
+        ...importData,
+        kebabCase: kebabCase(name)
+      });
+    } else if (path.includes("/plugins/")) {
+      imports.plugins.push(importData);
+    }
+  }
+  return imports;
 }
 
 function when(condition, content) {
@@ -597,34 +628,6 @@ const module$1 = defineNuxtModule({
 });
 function isFontIconSet(iconSet) {
   return !iconSet.startsWith("svg-");
-}
-function categorizeImports(importMap, quasarResolve) {
-  const imports = {
-    raw: importMap,
-    components: [],
-    composables: [],
-    directives: [],
-    plugins: []
-  };
-  for (const [name, path] of Object.entries(importMap)) {
-    const importData = {
-      name,
-      path: quasarResolve(path)
-    };
-    if (path.includes("/components/") && !path.includes("/__tests__/")) {
-      imports.components.push(importData);
-    } else if (path.includes("/composables/")) {
-      imports.composables.push(importData);
-    } else if (path.includes("/directives/")) {
-      imports.directives.push({
-        ...importData,
-        kebabCase: kebabCase(name)
-      });
-    } else if (path.includes("/plugins/")) {
-      imports.plugins.push(importData);
-    }
-  }
-  return imports;
 }
 const iconDeclarationPattern = /^export declare const ([a-zA-Z\d]+): string;?$/gm;
 function isFileNotFoundError(error) {

@@ -1,11 +1,11 @@
-import type { Plugin as VitePlugin } from 'vite'
 import semver from 'semver'
+import type { Plugin as VitePlugin } from 'vite'
 import type { ModuleContext } from '../../types'
 
 const QUASAR_ENTRY = 'quasar'
 const QUASAR_VIRTUAL_ENTRY = '\0/__quasar/entry.mjs'
 
-export function virtualQuasarEntryPlugin(context: ModuleContext): VitePlugin {
+export function virtualQuasarEntryPlugin (context: ModuleContext): VitePlugin {
   const { resolveQuasar, quasarVersion } = context
 
   const quasarGte216 = semver.gte(quasarVersion, '2.16.0')
@@ -23,7 +23,7 @@ export function virtualQuasarEntryPlugin(context: ModuleContext): VitePlugin {
     name: 'quasar:entry',
     enforce: 'pre',
 
-    config(config) {
+    config (config) {
       config.ssr ??= {}
       config.ssr.noExternal ??= []
       if (config.ssr.noExternal !== true) {
@@ -32,7 +32,7 @@ export function virtualQuasarEntryPlugin(context: ModuleContext): VitePlugin {
       }
     },
 
-    resolveId(id, _importer, options) {
+    resolveId (id, _importer, options) {
       const isSsrResolve = options?.ssr === true
       if (context.mode === 'server' && !isSsrResolve) {
         return
@@ -60,24 +60,24 @@ export function virtualQuasarEntryPlugin(context: ModuleContext): VitePlugin {
       }
     },
 
-    async load(id) {
+    async load (id) {
       if (!context.dev && id === QUASAR_VIRTUAL_ENTRY)
         return Object
           .entries(context.imports.raw)
-          // Quasar >= 2.26 ships dotted export names such as
-          // "QBtn.hydration.fixtures" which are not valid JS identifiers.
-          .filter(([name, path]) => !name.includes('.') && !path.includes('/__tests__/'))
+          // Non-identifier keys such as `QBtn.hydration.fixtures` are already dropped in
+          // `categorizeImports`, so only `__tests__` paths need to be filtered here.
+          .filter(([, path]) => !path.includes('/__tests__/'))
           .map(([name, path]) => `export { default as ${name} } from "quasar/${path}"`)
           .join('\n')
     },
   }
 }
 
-function toArray<T>(value: T | T[]): T[] {
+function toArray<T> (value: T | T[]): T[] {
   return Array.isArray(value) ? value : [value]
 }
 
-function isQuasarClientEntryId(id: string): boolean {
+function isQuasarClientEntryId (id: string): boolean {
   return id === 'quasar/dist/quasar.client.js'
     || id === 'quasar/dist/quasar.client.prod.js'
     || id.endsWith('/quasar/dist/quasar.client.js')

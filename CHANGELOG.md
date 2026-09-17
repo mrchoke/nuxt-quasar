@@ -1,5 +1,12 @@
 # Changelog
 
+## v3.0.7
+
+### 🩹 Fixes
+
+- Filter non-identifier import-map keys (Quasar >= 2.26 `*.hydration.fixtures`) in `categorizeImports` instead of only in the virtual entry, so the generated `quasar.shims.d.ts` no longer contains invalid members such as `QAjaxBar.hydration.fixtures?: ...` and `vue-tsc --noEmit` passes again
+- Stop emitting bogus `Q*HydrationFixtures` component types in `.nuxt/components.d.ts`
+
 ## v3.0.5
 
 [compare changes](https://github.com/Maiquu/nuxt-quasar/compare/v3.0.1...v3.0.5)

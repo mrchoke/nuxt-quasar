@@ -1,6 +1,6 @@
 {
   "name": "quasar",
-  "version": "3.0.6",
+  "version": "3.0.7",
   "configKey": "quasar",
   "compatibility": {
     "nuxt": ">=3.0.0"

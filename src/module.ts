@@ -12,10 +12,11 @@ import { virtualAnimationsPlugin } from './plugins/virtual/animations'
 import { virtualBrandPlugin } from './plugins/virtual/brand'
 import { virtualQuasarEntryPlugin } from './plugins/virtual/entry'
 import { setupCss } from './setupCss'
+import { categorizeImports } from './imports'
 import { generateTemplateQuasarConfig } from './template/config'
 import { generateTemplateShims } from './template/shims'
-import type { ModuleContext, QuasarFontIconSet, QuasarImportData, QuasarImports, QuasarSvgIconSet, QuasarUIConfiguration, ResolveFn } from './types'
-import { kebabCase, readFileMemoized, readJSON, uniq } from './utils'
+import type { ModuleContext, QuasarFontIconSet, QuasarSvgIconSet, QuasarUIConfiguration, ResolveFn } from './types'
+import { readFileMemoized, readJSON, uniq } from './utils'
 
 /* eslint-disable-next-line */ // This interface will be augmented after `nuxt prepare`
 export interface QuasarComponentDefaults { }
@@ -315,40 +316,6 @@ export default defineNuxtModule<ModuleOptions>({
 
 function isFontIconSet (iconSet: QuasarIconSet): iconSet is QuasarFontIconSet {
   return !iconSet.startsWith('svg-')
-}
-
-function categorizeImports (importMap: Record<string, string>, quasarResolve: ResolveFn): QuasarImports {
-  const imports: QuasarImports = {
-    raw: importMap,
-    components: [],
-    composables: [],
-    directives: [],
-    plugins: [],
-  }
-
-  for (const [name, path] of Object.entries(importMap)) {
-    const importData: QuasarImportData = {
-      name,
-      path: quasarResolve(path),
-    }
-    if (path.includes('/components/') && !path.includes('/__tests__/')) {
-      imports.components.push(importData)
-    }
-    else if (path.includes('/composables/')) {
-      imports.composables.push(importData)
-    }
-    else if (path.includes('/directives/')) {
-      imports.directives.push({
-        ...importData,
-        kebabCase: kebabCase(name),
-      })
-    }
-    else if (path.includes('/plugins/')) {
-      imports.plugins.push(importData)
-    }
-  }
-
-  return imports
 }
 
 const iconDeclarationPattern = /^export declare const ([a-zA-Z\d]+): string;?$/gm
